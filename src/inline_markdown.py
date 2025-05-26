@@ -9,15 +9,26 @@ For simplicity's sake, we won't allow it!
 """
 
 
+def text_to_textnodes(text):
+    """
+    Converts a raw string of markdown-flavored text into a list of TextNode objects.
+    """
+    nodes = [TextNode(text, TextType.NORMAL)]
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
 def extract_markdown_images(text):
     pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    # print(re.findall(pattern, text))
     return re.findall(pattern, text)
 
 
 def extract_markdown_links(text):
     pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)" 
-    # print(re.findall(pattern, text))
     return re.findall(pattern, text)
 
 
