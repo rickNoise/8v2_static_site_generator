@@ -10,7 +10,7 @@ For simplicity's sake, we won't allow it!
 
 
 def extract_markdown_images(text):
-    pattern = r"!\[([^\[\]]+)\]\(([^\(\)]*)\)"
+    pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
     # print(re.findall(pattern, text))
     return re.findall(pattern, text)
 
