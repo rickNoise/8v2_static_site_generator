@@ -16,9 +16,77 @@ def extract_markdown_images(text):
 
 
 def extract_markdown_links(text):
-    pattern = r"[^!]\[([^\[\]]+)\]\(([^\(\)]*)\)" 
+    pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)" 
     # print(re.findall(pattern, text))
     return re.findall(pattern, text)
+
+
+def split_nodes_image(old_nodes):
+    if not old_nodes: # if input list is empty, just return it
+        return old_nodes
+    
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.NORMAL:
+            new_nodes.append(node)
+            continue
+        extracted_images = extract_markdown_images(node.text)
+        remaining_text = node.text
+        for image in extracted_images:
+            sections = remaining_text.split(f"![{image[0]}]({image[1]})", 1)
+            if sections[0]: # if there is text before the image, add it as a node
+                new_nodes.append(TextNode(
+                    sections[0],
+                    TextType.NORMAL
+                ))
+            new_nodes.append(TextNode(
+                image[0], # the alt text
+                TextType.IMAGE,
+                image[1] # the image url
+            ))
+            remaining_text = sections[1] # update to only include the text after this image, so the processing of next image starts from where we left off
+        if remaining_text: # this is only True if there is trailing text after the last image; if so, we want to add it as a node
+            new_nodes.append(TextNode(
+                remaining_text,
+                TextType.NORMAL
+            ))
+    return new_nodes 
+
+
+def split_nodes_link(old_nodes):
+    if not old_nodes: # if input list is empty, just return it
+        return old_nodes
+    
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.NORMAL:
+            new_nodes.append(node)
+            continue
+        extracted_links = extract_markdown_links(node.text)
+        remaining_text = node.text
+        for link in extracted_links:
+            pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+            match = re.search(pattern, remaining_text) # returns first match only
+            if not match:
+                raise Exception("problem with split_nodes_link")
+            sections = remaining_text.split(match.group(0), 1)
+            if sections[0]: # if there is text before the link, add it as a node
+                new_nodes.append(TextNode(
+                    sections[0],
+                    TextType.NORMAL
+                ))
+            new_nodes.append(TextNode(
+                link[0], # the link text
+                TextType.LINK,
+                link[1] # the link url
+            ))
+            remaining_text = sections[1] # update to only include the text after this link, so the processing of next link starts from where we left off
+        if remaining_text: # this is only True if there is trailing text after the last link; if so, we want to add it as a node
+            new_nodes.append(TextNode(
+                remaining_text,
+                TextType.NORMAL
+            ))
+    return new_nodes 
 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
