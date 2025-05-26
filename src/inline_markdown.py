@@ -8,6 +8,19 @@ This is an _italic and **bold** word_.
 For simplicity's sake, we won't allow it!
 """
 
+
+def extract_markdown_images(text):
+    pattern = r"!\[([^\[\]]+)\]\(([^\(\)]*)\)"
+    # print(re.findall(pattern, text))
+    return re.findall(pattern, text)
+
+
+def extract_markdown_links(text):
+    pattern = r"[^!]\[([^\[\]]+)\]\(([^\(\)]*)\)" 
+    # print(re.findall(pattern, text))
+    return re.findall(pattern, text)
+
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     # old_nodes is a list of TextNodes
     # this only needs to handle textual inline elements
