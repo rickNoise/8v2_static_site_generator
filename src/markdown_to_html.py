@@ -150,8 +150,7 @@ def text_to_children(text):
 
 
 def block_to_block_html_tags(block):
-    # takes in a block, which is a string of markdown
-    # returns a string holding the opening html tag (as a string) required for that block
+    """ takes in a block, which is a string of markdown, returns a string holding the opening html tag (as a string) required for that block """
     
     block_type = block_to_block_type(block)
 
@@ -183,6 +182,18 @@ def strip_heading_prefix(text):
     heading_substring = match.group()
     heading_length = len(heading_substring)
     return text[heading_length:]
+
+
+def extract_title(markdown):
+    """
+    It should pull the h1 header from the markdown file (the line that starts with a single #) and return it.
+    If there is no h1 header, raise an exception.
+    extract_title("# Hello") should return "Hello" (strip the # and any leading or trailing whitespace)
+    """
+    for line in markdown.split("\n"):
+        if line.startswith("# "):
+            return strip_heading_prefix(line).strip()
+    raise Exception("Markdown file does not contain an h1 header!")
 
 
 def strip_prefixes_from_ordered_list_md(md):

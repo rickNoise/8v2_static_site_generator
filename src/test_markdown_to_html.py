@@ -7,6 +7,7 @@ from markdown_to_html import (
     strip_heading_prefix,
     strip_prefixes_from_ordered_list_md,
     strip_prefixes_from_unordered_list_md,
+    extract_title,
 )
 
 from htmlnode import LeafNode, ParentNode
@@ -194,5 +195,39 @@ two
 """
         self.assertEqual(
             strip_prefixes_from_unordered_list_md(md), 
+            exp_out
+        )
+    
+    def test_extract_title(self):
+        md = """
+## This is a h2 header
+
+# This is the first h1 header
+
+# This is the second h1 header
+
+blah
+blah
+blah
+"""
+        exp_out = "This is the first h1 header"
+        self.assertEqual(
+            extract_title(md),
+            exp_out
+        )
+    
+    def test_extract_title_no_h1(self):
+        md = """
+## This is a h2 header
+
+blah
+blah
+blah
+"""
+        exp_out = "Markdown file does not contain an h1 header!"
+        with self.assertRaises(Exception) as context:
+            extract_title(md)
+        self.assertEqual(
+            str(context.exception),
             exp_out
         )
