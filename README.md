@@ -3,7 +3,7 @@ A static site generator project for boot.dev.
 
 Place markdown files in the `content/` folder.
 Each markdown file will become an html webpage.
-The directory hierarchy will be relfected in the html output files generated in the `docs/` folder.
+The directory hierarchy will be reflected in the html output files generated in the `docs/` folder.
 
 Any images referenced in the markdown files can be store in static.
 
