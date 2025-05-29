@@ -1,2 +1,8 @@
 # 8v2_static_site_generator
-Second attempt at this boot.dev project
+A static site generator project for boot.dev.
+
+Place markdown files in the content/ folder.
+Each markdown file will become an html webpage.
+The directory hierarchy will be relfected in the html output.
+
+Any images referenced in the markdown files can be store in static.
