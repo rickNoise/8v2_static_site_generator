@@ -6,7 +6,7 @@ from htmlnode import HTMLNode
 import os
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath="/"):
     # print(f"Generating page from {from_path} to {dest_path} using {template_path}...")
 
     # Read the markdown file at from_path and store the contents in a variable.
@@ -30,21 +30,36 @@ def generate_page(from_path, template_path, dest_path):
     final_html_with_title_and_content = from_path_contents_as_html.join(
         final_html_with_title.split("{{ Content }}", 1)
     )
+    
+    # update any href URLs to account for basepath
+    html_with_updated_href = final_html_with_title_and_content.replace('href="/', f'href="{basepath}')
+    # update any src URLs to account for basepath
+    html_with_updated_src = html_with_updated_href.replace('src="/', f'src="{basepath}')
+
+    return_html = html_with_updated_src
 
     with open(dest_path, "w") as f:
-        f.write(final_html_with_title_and_content)
+        f.write(return_html)
     
     if not f.closed:
         raise Exception("dest_path file did not close successfully!")
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, dest_file_ext=".html"):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath="/", dest_file_ext=".html"):
     """
     Crawl every entry in the content directory.
     For each markdown file found, generate a new .html file using the same template.html. 
     The generated pages should be written to the public directory in the 
     same directory structure.
     """
+    
+    # pre-process basepath to always begin and end with "/", e.g. "/path/"
+    if len(basepath) < 1:
+        raise ValueError("basepath must be a string of at least length 1!")
+    if basepath != "/" and basepath[-1] != "/":
+        basepath += "/"
+    if basepath != "/" and basepath[0] != "/":
+        basepath = "/" + basepath
 
     # check that dir_path_content exists and is a directory
     if not os.path.exists(dir_path_content):
@@ -66,7 +81,8 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, des
                 generate_page(
                     entry_path, 
                     template_path, 
-                    os.path.join(dest_dir_path, file_name + dest_file_ext)
+                    os.path.join(dest_dir_path, file_name + dest_file_ext),
+                    basepath=basepath
                 )
         if os.path.isdir(entry_path):
             # print(f"{entry} is a directory. Recursively running generate_pages_recursive with dir_path_content: {dir_path_content}, template_path: {os.path.abspath(template_path)}, and dest_dir_path: {dest_dir_path}...")
@@ -85,7 +101,8 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, des
             generate_pages_recursive(
                 os.path.join(dir_path_content, entry),
                 os.path.abspath(template_path),
-                new_dest_dir_path
+                new_dest_dir_path,
+                basepath=basepath
             )
     
     # print("COMPLETED running generate_pages_recursive.")

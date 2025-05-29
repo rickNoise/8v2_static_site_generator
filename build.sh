@@ -1,0 +1,1 @@
+python3 src/main.py "8v2_static_site_generator"
